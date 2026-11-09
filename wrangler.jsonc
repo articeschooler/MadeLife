@@ -3,6 +3,10 @@
   "compatibility_date": "2026-11-01",
   "workers_dev": true,
   "preview_urls": true,
+  "routes": [
+    { "pattern": "madelifesim.com", "custom_domain": true },
+    { "pattern": "www.madelifesim.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./",
     "not_found_handling": "single-page-application"
