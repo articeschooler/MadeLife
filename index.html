@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0b0d">
 <title>Made — A Life in the Life</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -12,8 +15,8 @@
 html,body{background:var(--bg)}
 body{color:var(--tx);font:14px/1.55 Inter,system-ui,-apple-system,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-#rain{position:fixed;inset:-40px;pointer-events:none;opacity:.05;z-index:0;background-image:repeating-linear-gradient(100deg,transparent 0 22px,#cfd8e8 22px 23px);animation:rain .6s linear infinite}
-@keyframes rain{to{transform:translate(-8px,46px)}}
+#rain{position:fixed;inset:0;pointer-events:none;opacity:.05;z-index:0;background-image:repeating-linear-gradient(100deg,transparent 0 22px,#cfd8e8 22px 23px);background-size:100% 46px;animation:rain .6s linear infinite}
+@keyframes rain{to{background-position:-8px 46px}}
 @media (prefers-reduced-motion:reduce){#rain{animation:none}}
 #vig{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(201,163,91,.10),transparent 55%),radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.75))}
 #app{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 0 150px}
@@ -88,7 +91,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .meter{height:10px;border-radius:5px;background:#22252b;overflow:hidden;margin:6px 0}.meter i{display:block;height:100%}
 /* modal */
 #modal{position:fixed;inset:0;z-index:20;background:rgba(4,5,6,.82);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;padding:0}
-#modal .box{width:100%;max-width:680px;max-height:92vh;overflow:auto;background:linear-gradient(#15171b,#101215);border:1px solid var(--ln);border-bottom:0;border-radius:14px 14px 0 0;padding:22px 18px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease}
+#modal .box{width:100%;max-width:680px;max-height:88vh;max-height:88dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:linear-gradient(#15171b,#101215);border:1px solid var(--ln);border-bottom:0;border-radius:14px 14px 0 0;padding:22px 18px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease}
 @media(min-width:700px){#modal{align-items:center}#modal .box{border-radius:12px;border-bottom:1px solid var(--ln)}}
 @keyframes up{from{transform:translateY(24px);opacity:0}}
 .ekick{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gd)}
@@ -106,8 +109,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .fx span{font-family:var(--mono);font-size:12px;padding:3px 8px;border-radius:4px;border:1px solid var(--ln)}
 .fx .up{color:var(--gn);border-color:#2f4229}.fx .dn{color:#e08a82;border-color:#4a2522}
 /* title & setup */
-.title{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 22px 48px;position:relative;overflow:hidden}
-.sky{display:block;width:calc(100% + 44px);margin:0 -22px 28px;height:230px;opacity:.9}
+.title{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 22px 48px;position:relative;overflow:hidden}
+.sky{display:block;width:100%;margin:0 0 28px;height:230px;opacity:.9}
 .logo{font-family:var(--serif);font-weight:900;font-size:84px;letter-spacing:6px;line-height:.9;color:var(--tx)}
 .logo em{font-style:italic;font-weight:500;color:var(--gd);font-size:18px;letter-spacing:3px;display:block;margin-top:10px}
 .tagline{color:var(--mu);max-width:420px;margin:16px 0 26px;font-size:14px}
@@ -177,6 +180,23 @@ input[type=text]:focus{outline:none;border-color:var(--gd2)}
 .etext{font-size:14.5px;line-height:1.6}
 .choice{padding:10px 12px}
 #modal .box{padding:18px 16px calc(16px + env(safe-area-inset-bottom))}
+
+/* iPhone: no zoom, no rubber-band, no sideways drift, no background scroll behind popups */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{overflow-x:hidden;overscroll-behavior-y:none;max-width:100%}
+*{-webkit-tap-highlight-color:transparent}
+button,a,.tile,.choice,.act{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+input,textarea,select{font-size:16px!important}
+#modal{overscroll-behavior:contain}
+#modal .box{touch-action:pan-y}
+body.locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
+#hdr{padding-top:max(8px,env(safe-area-inset-top))}
+#hdr .hrow{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1.35fr) minmax(0,.9fr) minmax(0,.9fr) auto;overflow:visible}
+#hdr .chip{padding:3px 4px}#hdr .chip b{letter-spacing:.2px;margin-right:2px}
+#hdr .chip{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.seg button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map{min-width:0}.tile{min-width:0}
+#view{overflow-anchor:none}
 </style>
 </head>
 <body>
@@ -630,7 +650,7 @@ function showEnding(){const g=G;$('#hdr').classList.add('hidden');$('#dock').cla
  <div class="sec" style="margin-top:30px">The Record</div>
  <div class="card ledger"><div><span>Name</span><span>${esc(pname(g))}</span></div><div><span>Highest rank</span><span>${['Associate','Soldier','Capo','Underboss','Boss / Kingpin'][g.peak]}</span></div><div><span>Years in the life</span><span>${g.age-21}</span></div><div><span>Years at the top</span><span>${Math.floor(g.bossYears)}</span></div><div><span>Net worth</span><span>${money(netWorth(g))}</span></div><div><span>Lifetime take</span><span>${money(g.earned)}</span></div><div><span>Years in prison</span><span>${Math.round(g.prisonYears*10)/10}</span></div><div><span>Bodies</span><span>${g.kills}</span></div><div><span>Children</span><span>${esc(kids)}</span></div><div class="tot"><span>Legacy</span><span>${legacy(g)}</span></div></div>
  <div class="sec">Last pages of the chronicle</div><div class="card log">${g.log.slice(0,12).map(l=>`<p><b>${l.y}</b>${l.t}</p>`).join('')}</div>
- <button class="btn gold" style="width:100%;padding:14px;margin-top:10px" data-a="title">Begin a new life</button></div>`;window.scrollTo(0,0);}
+ <button class="btn gold" style="width:100%;padding:14px;margin-top:10px" data-a="title">Begin a new life</button></div>`;toTop();}
 
 /* ================= EVENTS ================= */
 const S=g=>full(g.npc.sponsor), BOSS=g=>g.npc.boss?full(g.npc.boss):'the boss', FAM=g=>fam(g)?CITIES[homeOf(g)].fam:(g.famName||'your crew');
@@ -1747,17 +1767,25 @@ function renderSetup(){const s=SETUP;const H=HER[s.her];
  <div class="sec">Starting position</div>${opt('start',{young:{n:'Street Kid at 16',d:'No crew, no money, no name. Hustle, find associates, and found a family of your own.'},family:{n:'Family Associate at 21',d:'Under a sponsor. Climb the ladder: soldier, capo, underboss, boss.'},indie:{n:'Independent Crew at 21',d:'Two guys and one neighborhood. Answer to nobody.'}})}
  ${s.start==='young'?`<div class="note">You'll start with nothing. A family may notice you and offer to take you on — or you can build your own and name it.</div>`:''}${s.model==='trad'&&s.her!=='italian'&&s.start==='family'?`<div class="note">A traditional family will let you earn with them — but will never make you. You'll be able to break away when you're ready.</div>`:''}
  <button class="btn gold" style="width:100%;padding:15px;margin-top:22px;font-size:14px" data-a="start">Step into the life</button>
- <button class="btn" style="width:100%;margin-top:8px" data-a="title">Back</button></div>`;window.scrollTo(0,0);}
+ <button class="btn" style="width:100%;margin-top:8px" data-a="title">Back</button></div>`;toTop();}
 function syncSetup(){const f=$('#fn'),l=$('#ln'),n=$('#nk');if(f){SETUP.first=f.value.trim();SETUP.last=l.value.trim();SETUP.nick=n.value.trim();}}
 function randName(){const p=person(SETUP.her);SETUP.first=p.first;SETUP.last=p.last;SETUP.nick='';}
 
+
+/* ---- iPhone scroll lock: freeze the page while a popup is open ---- */
+let LOCKY=0,LOCKED=false;
+function setLock(on){if(on===LOCKED)return;LOCKED=on;const b=document.body;
+ if(on){LOCKY=window.scrollY||0;b.style.top=(-LOCKY)+'px';b.classList.add('locked');}
+ else{b.classList.remove('locked');b.style.top='';window.scrollTo(0,LOCKY);}}
+new MutationObserver(()=>setLock(!$('#modal').classList.contains('hidden'))).observe(document.getElementById('modal'),{attributes:true,attributeFilter:['class']});
+function toTop(){if(LOCKED)LOCKY=0;else window.scrollTo(0,0);}
 /* ================= INPUT ================= */
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a,x=b.dataset.x;
  switch(a){
  case'ch':return choose(+x);case'next':return next();
- case'tab':TAB=x;render();window.scrollTo(0,0);return;
- case'sub':{const[t,k]=x.split(':');SUB[t]=k;SHOPALL=false;render();return;}
- case'go':{const[t,k]=x.split(':');TAB=t;if(k)SUB[t]=k;render();window.scrollTo(0,0);return;}
+ case'tab':TAB=x;render();toTop();return;
+ case'sub':{const[t,k]=x.split(':');SUB[t]=k;SHOPALL=false;render();toTop();return;}
+ case'go':{const[t,k]=x.split(':');TAB=t;if(k)SUB[t]=k;render();toTop();return;}
  case'goal':return claimGoal(x);case'story':return tellStory();
  case'crewopen':CREWOPEN=CREWOPEN===+x?null:+x;render();return;case'rkopen':RKOPEN=!RKOPEN;render();return;case'shopall':SHOPALL=true;render();return;case'jobgrp':return jobMenu(G,x);
  case'endWeek':return endWeek();
@@ -1782,7 +1810,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
  case'setup':SETUP={first:'',last:'',nick:'',city:'newyork',her:'italian',bg:'street',model:'trad',start:'family'};randName();return renderSetup();
  case'pick':{syncSetup();const[k,v]=x.split(':');SETUP[k]=v;return renderSetup();}
  case'rname':syncSetup();randName();return renderSetup();
- case'start':{syncSetup();if(!SETUP.first||!SETUP.last)randName();newGame(SETUP);ensureStory(G);TAB='life';SUB.life='week';SEL=null;save();render();window.scrollTo(0,0);
+ case'start':{syncSetup();if(!SETUP.first||!SETUP.last)randName();newGame(SETUP);ensureStory(G);TAB='life';SUB.life='week';SEL=null;save();render();toTop();
   const st=SETUP.start;
   info(st==='young'?'Sixteen':'Twenty-One',`<p>${esc(CITIES[SETUP.city].n)}, January ${G.year}. ${st==='young'?`You're sixteen, with three hundred dollars and nobody's protection. Hustle. Find associates — kids like you who want more. Build respect and money, and one day put your own name on a family.`:st==='indie'?`You have two guys, one neighborhood, and no one to answer to. Every crew in the city is a rival — including ${esc(CITIES[SETUP.city].fam)}.`:`${esc(S(G))} has agreed to take you on. You're not made. You're not anything yet. You're a guy who gets coffee and doesn't ask questions.`}</p><p>Every week you get a couple of moves — more as you rise. Make them, then end the week: money moves, heat builds or cools, and sometimes the phone rings. End a week without doing anything and you lie low: heat −10, federal case −5. Progress is slow. That's the life.</p><p class="muted" style="font-size:13px">Watch your Heat and the federal Case. Pay your crew. The more territory you hold, the more it pays — and the more the other families want you dead.</p>`,'A new life');Q=storyQs(G);return;}
  }});
