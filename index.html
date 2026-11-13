@@ -197,6 +197,13 @@ body.locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .seg button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .map{min-width:0}.tile{min-width:0}
 #view{overflow-anchor:none}
+
+.bjt{background:#0f2a1c;border:1px solid #1f4a33;border-radius:10px;padding:12px;margin:10px 0}
+.cd{display:inline-block;min-width:36px;padding:8px 6px;margin:4px 4px 0 0;border-radius:6px;background:#f3efe4;color:#16120a;font:600 15px/1 var(--mono);text-align:center;box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.cd.red{color:#b8302a}.cd.back{background:repeating-linear-gradient(45deg,#7d2a24 0 4px,#5a1d19 4px 8px);height:31px;vertical-align:bottom}
+.advi small{font-size:11.5px}
+.grid2 .act span{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.grid2 .act{display:flex;flex-direction:column;justify-content:center}
 </style>
 </head>
 <body>
@@ -407,13 +414,13 @@ function genFam(g,used){const H={italian:['Family','Rival family'],irish:['Crew'
 function spawnIn(g,dist,rivals){const used=new Set(cityList(g).flatMap(c=>c[2].map(r=>r.n)));if(rivals.filter(r=>r.alive!==false).length>=5)return null;const opts=NEWFAMS.filter(f=>!used.has(f[0]));const f=opts.length?pick(opts):genFam(g,used);
  const cols=NCOL.filter(c=>!rivals.some(r=>r.alive!==false&&r.col===c));const r={id:'n'+(g.uid++),n:f[0],t:f[1],h:f[2],str:R(32,50),host:R(35,55),bank:R(150,450)*1000,col:cols[0]||pick(NCOL),boss:full(person(f[2])),alive:true,war:false};rivals.push(r);
  const free=shuffle(dist.filter(d=>d.own==='none')).slice(0,R(1,3));for(const d of free){d.own=r.id;d.rk=['protection'];d.sec=1;}if(!free.length){r.str=R(45,65);r.host=R(80,95);r.bank+=R(300,800)*1000;if(chance(.5))r.war=true;}log(`${r.n} moved in.`);return r;}
-function cityTick(g,ck,dist,rivals,notes,M,ext){const live=rivals.filter(r=>r.alive!==false);const mine=dist.filter(d=>d.own==='you');const away=ck!==homeOf(g);const cn=ck!==g.city?` (${CITIES[ck].n})`:'';const sf=away?.75:1;
+function cityTick(g,ck,dist,rivals,notes,M,ext){const live=rivals.filter(r=>r.alive!==false);const mine=dist.filter(d=>d.own==='you');const away=ck!==homeOf(g);const cn=ck!==g.city?` (${CITIES[ck].n})`:'';const sf=(away?.75:1)*(g.prison?.6:1);
  for(const r of live){const held=dist.filter(d=>d.own===r.id).length;r.peakD=Math.max(r.peakD||0,held);r.bank=Math.max(0,(r.bank||300000)+held*2500*(away?CM[ck]:1)+1000-(r.war?(r.bank||0)*.01:0));r.str=clamp(r.str+((r.war?.08:.03)+mine.length*.006+(r.str<30?.15+held*.04:0))*(1-r.str/130),0,100);
   if(r.war&&r.str<20&&chance(.03)){const al=live.find(x=>x.id!==r.id&&!x.war);if(al){r.str+=R(4,8);al.host=clamp(al.host+6);notes.push(`${al.n} quietly sent shooters to help ${r.n} hold on${cn}.`);}}
   r.host=clamp(r.host+((Math.random()*8-3)+(g.emp.includes('commission')?0:mine.length*.9+(away?3:0))+vioLvl(g)*.4)*M);
   if(away&&!r.war&&mine.length&&r.host>=75&&chance((r.host-70)/100*(1+mine.length*.15)/14*vioF(g))){r.war=true;notes.push(`<span class="neg">${r.n} declared war on you in ${CITIES[ck].n}.</span>`);log(`${r.n} declared war on you in ${CITIES[ck].n}.`);}
   const rd=dist.filter(d=>d.own==='none');if(rd.length&&chance(.12*M)){const d=pick(rd);d.own=r.id;d.rk=['protection'];notes.push(`${r.n} moved into ${d.n}${cn}.`);}
-  if(r.war&&!g.prison){g.s.heat=clamp(g.s.heat+(away?.15:.1));const own=dist.filter(d=>d.own==='you');
+  if(r.war){if(!g.prison)g.s.heat=clamp(g.s.heat+(away?.15:.1));const own=dist.filter(d=>d.own==='you');
    if(own.length&&chance(Math.min(.9,(.14+r.str/450+own.length*.006)*(away?1.3:1)*Math.min(2,vioF(g))))){const d=pick(own),def=crewStr(g)*.45*sf+SEC[d.sec||0].b,roll=r.str*(.4+Math.random()*.9);
     if(roll>def){const lv=d.rk.filter(k=>!(d.dmg||[]).includes(k));
      if(lv.length){const k=pick(lv);(d.dmg=d.dmg||[]).push(k);notes.push(`<span class="neg">${r.n} torched your ${RK[k].n} in ${d.n}${cn}.</span> Repairs: ${money(RK[k].c*.45)}.`);}
@@ -421,7 +428,7 @@ function cityTick(g,ck,dist,rivals,notes,M,ext){const live=rivals.filter(r=>r.al
      if(chance(away?.16:.12)){const l=loseCrew(g,`in the war with ${r.n}`);if(l)notes.push(`<span class="neg">${l}</span>`);}
      if(chance((g.ops.armor?.015:.035)*(away?1.5:1))){g.s.health=clamp(g.s.health-(g.ops.doctor?6:10));g.y.hurt=1;notes.push(`<span class="neg">A car pulls up next to yours at a light${cn}. You live. Barely.</span>`);}}
     else{r.str=Math.max(0,r.str-.5);notes.push(`Your people drove off a ${r.n} hit crew in ${d.n}${cn}.`);}}}}
- if(!g.prison)for(const d of dist.filter(d=>d.own==='you'&&d.from)){const r=rivals.find(x=>x.id===d.from&&x.alive!==false);if(!r){d.from=null;continue;}if(r.war)continue;
+ for(const d of dist.filter(d=>d.own==='you'&&d.from)){const r=rivals.find(x=>x.id===d.from&&x.alive!==false);if(!r){d.from=null;continue;}if(r.war)continue;
   if(chance((.018+r.host/3500)*(away?1.4:1)*vioF(g))){const def=crewStr(g)*.45*sf+SEC[d.sec||0].b,roll=r.str*(.45+Math.random()*.9);r.host=clamp(r.host+2);
    if(roll>def){const lv=d.rk.filter(k=>!(d.dmg||[]).includes(k));
     if(lv.length&&roll<def*1.7){const k=pick(lv);(d.dmg=d.dmg||[]).push(k);notes.push(`<span class="neg">${r.n} came back for ${d.n}${cn} and wrecked your ${RK[k].n}.</span> Repairs: ${money(RK[k].c*.45)}.`);}
@@ -1222,6 +1229,60 @@ const ACT={
  pGym:{n:'Work Out',d:'Violence and health.',prison:1,run:g=>{A({violence:.25,health:.3});return'Push-ups in the cell, every morning, every night.';}},
  pLaw:{n:'Study Law',d:'Discretion and business.',prison:1,run:g=>{A({discretion:.5,business:.25});return'You read every RICO appeal in the prison library.';}}
 };
+/* ================= BLACKJACK ================= */
+let BJ=null;
+function bjDeck(){const d=[];for(const s of ['♠','♥','♦','♣'])for(const r of ['A','2','3','4','5','6','7','8','9','10','J','Q','K'])d.push(r+s);return shuffle(d.concat(d));}
+function bjVal(h){let v=0,a=0;for(const c of h){const r=c.slice(0,-1);if(r==='A'){a++;v+=11;}else v+=['J','Q','K'].includes(r)?10:+r;}while(v>21&&a){v-=10;a--;}return v;}
+const bjCard=(c,hide)=>hide?'<span class="cd back"></span>':`<span class="cd ${/[♥♦]/.test(c)?'red':''}">${c}</span>`;
+function bjBets(g){return[500,2500,10000,50000,250000,1000000,5000000].filter(b=>b<=cash(g)).slice(-4);}
+function bjOpen(g){BJ={hand:0,stage:'bet',deck:bjDeck(),net:0,msg:pick(['A retired cop deals. The game runs till the coffee runs out.','Six-deck shoe, a cloud of cigar smoke, and a pit boss who owes you a favor.','The dealer has the fastest hands in the borough. Watch them.'])};bjDraw();}
+function bjDraw(){const g=G,B=BJ;CUR={title:'Back-Room Card Game',ch:[]};FX=[];
+ const tally=`<div class="muted small">Hand ${B.hand} of 6 · tonight ${B.net>=0?'<span class="pos">+'+money(B.net)+'</span>':'<span class="neg">'+money(B.net)+'</span>'}</div>`;
+ const table=B.stage==='bet'?'':`<div class="bjt"><div class="muted small">Dealer ${B.stage==='play'?'':'· '+bjVal(B.d)}</div><div>${B.d.map((c,i)=>bjCard(c,B.stage==='play'&&i===1)).join('')}</div><div class="muted small" style="margin-top:10px">You · ${bjVal(B.p)} · bet ${money(B.bet)}</div><div>${B.p.map(c=>bjCard(c)).join('')}</div></div>`;
+ let btns='';
+ if(B.stage==='bet'){const bets=bjBets(g);btns=bets.length?bets.map(b=>`<button class="choice" data-a="bj" data-x="deal:${b}" style="text-align:center"><b>Bet ${money(b)}</b></button>`).join(''):'<div class="muted small">You can\'t cover the minimum.</div>';btns=`<div class="grid2">${btns}</div><button class="choice" data-a="bj" data-x="leave" style="text-align:center"><b>Leave the table</b></button>`;}
+ else if(B.stage==='play')btns=`<div class="grid2"><button class="choice" data-a="bj" data-x="hit" style="text-align:center"><b>Hit</b></button><button class="choice" data-a="bj" data-x="stand" style="text-align:center"><b>Stand</b></button></div>${B.p.length===2&&cash(g)>=B.bet?`<button class="choice" data-a="bj" data-x="double" style="text-align:center"><b>Double down · ${money(B.bet)} more</b></button>`:''}`;
+ else btns=`<div class="etext" style="margin:8px 0">${B.res}</div><div class="grid2">${B.hand<6&&bjBets(g).length?`<button class="choice" data-a="bj" data-x="again" style="text-align:center"><b>Next hand</b></button>`:''}<button class="choice" data-a="bj" data-x="leave" style="text-align:center"><b>Cash out</b></button></div>`;
+ $('#mbox').innerHTML=`<div class="ekick">${dateStr(g)}</div><div class="etitle">Blackjack</div>${B.stage==='bet'&&!B.hand?`<div class="etext"><p>${B.msg}</p></div>`:''}${tally}${table}<div class="choices">${btns}</div>`;$('#modal').classList.remove('hidden');}
+function bjSettle(){const g=G,B=BJ;while(bjVal(B.d)<17)B.d.push(B.deck.pop());const p=bjVal(B.p),d=bjVal(B.d);let pay=0;
+ if(p>21)B.res='Bust. The dealer rakes it in without looking up.';
+ else if(B.bj){pay=B.bet*2.5;B.res=`Blackjack. ${money(B.bet*1.5)} on top of your bet.`;}
+ else if(d>21||p>d){pay=B.bet*2;B.res=d>21?`Dealer busts with ${d}. You take ${money(B.bet)}.`:`${p} beats ${d}. You take ${money(B.bet)}.`;}
+ else if(p===d){pay=B.bet;B.res=`Push at ${p}. Your money comes back.`;}
+ else B.res=`Dealer's ${d} beats your ${p}.`;
+ g.dirty+=pay;if(pay>B.bet)g.earned+=pay-B.bet;B.net+=pay-B.bet;B.stage='done';bjDraw();}
+function bjAct(x){const g=G,B=BJ;if(!B)return;const[a,v]=x.split(':');
+ if(a==='deal'||a==='again'){if(a==='again'){B.stage='bet';return bjDraw();}const bet=+v;if(cash(g)<bet)return;spend(bet);B.bet=bet;B.hand++;if(B.deck.length<20)B.deck=bjDeck();B.p=[B.deck.pop(),B.deck.pop()];B.d=[B.deck.pop(),B.deck.pop()];B.bj=bjVal(B.p)===21;B.stage='play';if(B.bj||bjVal(B.d)===21)return bjSettle();return bjDraw();}
+ if(a==='hit'){B.p.push(B.deck.pop());if(bjVal(B.p)>21)return bjSettle();if(bjVal(B.p)===21)return bjSettle();return bjDraw();}
+ if(a==='stand')return bjSettle();
+ if(a==='double'){if(cash(g)<B.bet)return;spend(B.bet);B.bet*=2;B.p.push(B.deck.pop());return bjSettle();}
+ if(a==='leave'){const n=B.net;BJ=null;A({charisma:.2,heat:-.3});if(Math.abs(n)>=100000)log(`${n>0?'Won':'Lost'} ${money(Math.abs(n))} at the back-room card game.`);closeModal();render();toast(n>0?`You walk away up ${money(n)}.`:n<0?`You walk away down ${money(-n)}.`:'You walk away even.',true);}}
+
+/* ================= FAVORS ================= */
+const FAV=[
+ {k:'bakery',n:'Protect the bakery',s:['fear','violence'],df:30,who:g=>'Mrs. '+pick(HER.italian.l),d:(g,w)=>`${w}'s bakery is getting shaken down by teenagers from across the avenue. She's paid them twice. She asks you, quietly, over the counter.`,win:(g,w)=>{A({respect:2,fear:1,dirty:sc(g,1500)});return`You wait for them on Thursday. They never come back. ${w} won't take your money for bread again, ever, and she tells everyone why.`;},lose:(g,w)=>{A({respect:-1,health:-4,hurt:0});return`There are more of them than you thought. You run them off, but you take a bottle across the back of the head doing it.`;}},
+ {k:'car',n:'Find a stolen car',s:['street','discretion'],df:28,who:g=>'Father '+pick(HER.irish.l),d:(g,w)=>`Somebody stole ${w}'s Buick out of the rectory lot. He doesn't want the police. He wants it back by Sunday.`,win:(g,w)=>{A({respect:1.5,charisma:1,heat:-1});return`A chop shop in Red Hook still had it on the lift. The car is back by Saturday, washed. ${w} blesses you from the pulpit, without naming you.`;},lose:(g,w)=>{A({respect:-.5});return`It's already in pieces in three states. You buy him a used one out of your own pocket to save face.`;}},
+ {k:'feud',n:'Settle a feud',s:['charisma','respect'],df:32,who:g=>pick(['Two butchers','Two cab owners','Two brothers','Two pizzerias']),d:(g,w)=>`${w} on the same block have been at war for a year over a parking space, a woman, or an insult nobody remembers. Both come to you to decide it.`,win:(g,w)=>{A({respect:2.5,charisma:1,pol:.5});return`You hear both sides over espresso and split it down the middle. Both leave thinking they won. That's the whole trick.`;},lose:(g,w)=>{A({respect:-1});return`One of them storms out insulting your judgment in front of the whole café.`;}},
+ {k:'crate',n:'Move a crate, no questions',s:['street','discretion'],df:36,who:g=>full(person(pick(['russian','albanian','irish']))),d:(g,w)=>`${w} needs a crate moved from a warehouse in the Bronx to a garage in Jersey tonight. He'll pay well. He won't say what's in it.`,win:(g,w)=>{const m=sc(g,6000);A({dirty:m,street:1});return`A van, two toll booths, and a garage door that opens before you knock. ${money(m)} in an envelope. You never find out what was in it.`;},lose:(g,w)=>{A({heat:6,inv:3});return`A state trooper pulls you over for a taillight. He doesn't open the crate, but he writes down everything else.`;}},
+ {k:'widow',n:'Stop an eviction',s:['fear','charisma'],df:30,who:g=>'The widow '+pick(HER.italian.l),d:(g,w)=>`${w}'s new landlord wants her out so he can triple the rent. She's lived there forty years. Her son was in your grade.`,win:(g,w)=>{A({respect:2.5,fear:1,mother:3});return`You visit the landlord at his office. You don't raise your voice. Her rent goes down.`;},lose:(g,w)=>{A({heat:3,respect:-.5});return`The landlord has a lawyer and a cousin on the force. She gets six more months, not forever.`;}},
+ {k:'kid',n:'Get a kid out of a jam',s:['charisma','street'],df:34,who:g=>pick(HER[g.her].f),d:(g,w)=>`${w}, nineteen, got picked up holding something that wasn't his. His mother is in your mother's prayer group. A desk sergeant can be reasoned with.`,win:(g,w)=>{A({respect:1.5,loyalty:1});if(active(g).length<maxCrew(g)){const c=mkCrew();Object.assign(c,{first:w,nick:'',sk:3,loy:85,gr:20,role:'driver'});g.crew.push(c);return`The charges disappear. ${w} shows up at the club the next day and says he owes you his life. He drives for you now.`;}return`The charges disappear. His mother lights a candle for you.`;},lose:(g,w)=>{A({heat:2,respect:-.5});return`The sergeant takes the envelope and the kid still does ninety days.`;}},
+ {k:'poorbox',n:'Find who robbed the church',s:['street','fear'],df:30,who:g=>'Monsignor '+pick(HER.italian.l),d:(g,w)=>`Somebody cleaned out the poor box at St. Anthony's. ${w} doesn't want a police report in the paper. He wants it handled.`,win:(g,w)=>{A({respect:3,fear:1,heat:-2});return`It was a junkie from two blocks over. He returns the money, with interest from your pocket, and leaves the neighborhood. The parish never forgets it.`;},lose:(g,w)=>{A({respect:-.5});return`Whoever did it is long gone. You put the money back yourself and say nothing.`;}},
+ {k:'zoning',n:'Fix a zoning vote',need:g=>g.pol>=10,s:['business','charisma'],df:40,who:g=>'A developer named '+full(person('irish')),d:(g,w)=>`${w} needs a variance through the board by Tuesday. He'll make it worth your while, on paper and off.`,win:(g,w)=>{const m=sc(g,12000);A({clean:m,pol:3,business:1});return`Three phone calls and a dinner. The vote passes four to one. ${money(m)} arrives as a "consulting fee," perfectly clean.`;},lose:(g,w)=>{A({pol:-2,heat:2});return`One board member records the conversation. It doesn't go anywhere, but your friends at city hall get nervous.`;}},
+ {k:'card',n:'Bail out a politician\'s son',need:g=>g.s.respect>=25,s:['fear','business'],df:38,who:g=>'The son of '+CITIES[homeOf(g)].pol+' '+g.npc.alderman.last,d:(g,w)=>`${w} is into a rival bookmaker for a sum his father can't explain. The family asks if you can make it go away quietly.`,win:(g,w)=>{A({pol:4,respect:1});g.npc.alderman.rel=clamp(g.npc.alderman.rel+15);return`You buy the marker for half its face and tear it up in front of the father. He'll take your calls for the rest of his career.`;},lose:(g,w)=>{A({rivalHost:5});return`The bookmaker won't sell, and now he knows whose friends owe him.`;}},
+ {k:'wedding',n:'Security for a wedding',s:['fear','violence'],df:26,who:g=>'The '+pick(HER[g.her].l)+' family',d:(g,w)=>`${w} is marrying off their daughter. Her ex-boyfriend has been making threats. They want serious men at the door.`,win:(g,w)=>{const m=sc(g,3000);A({dirty:m,respect:1.5,crewLoy:2});return`The ex shows up, takes one look at your guys, and leaves. You dance with the bride's grandmother. ${money(m)} and a tray of cookies.`;},lose:(g,w)=>{A({heat:3,respect:-.5});return`The ex gets in anyway and there's a fistfight during the toasts. Nobody blames you, out loud.`;}}
+];
+function favRefresh(g){if(g.prison)return;if(!g.favors||T(g)>=(g.favRef||0)){const pool=FAV.filter(f=>!f.need||f.need(g));g.favors=shuffle(pool).slice(0,3).map(f=>({k:f.k,who:f.who(g)}));g.favRef=T(g)+4;}}
+function favOpen(i){const g=G,fv=(g.favors||[])[+i];if(!fv)return;const f=FAV.find(x=>x.k===fv.k);if(!f)return;
+ openEvent({title:f.n,text:f.d(g,fv.who),ch:[
+  {t:'Do it',s:`1 action · ${LBL[f.s[0]]} & ${LBL[f.s[1]]}`,p:g=>odds(g.s[f.s[0]],g.s[f.s[1]],f.df),f:(g,w)=>{if(!useAP())return null;g.favors=g.favors.filter(x=>x!==fv);return w?f.win(g,fv.who):f.lose(g,fv.who);}},
+  {t:'Turn it down',f:g=>{g.favors=g.favors.filter(x=>x!==fv);A({respect:-.3});return'You say no, politely. People remember who helps them.';}},
+  {t:'Not right now',f:()=>null}]});}
+Object.assign(ACT,{
+ cards:{n:'Back-Room Card Game',d:'Blackjack at the club. Win big or go home light.',ok:g=>g.age>=18,run:g=>{bjOpen(g);return'NOOP';}},
+ golf:{n:'Golf With the Powerful',d:g=>`${money(sc(g,5000))} for the round. Political pull, charisma.`,ok:g=>g.age>=25&&g.s.respect>=30,run:g=>{const c=sc(g,5000);if(cash(g)<c){G.ap++;toast('Needs '+money(c));return'NOOP';}A({cash:-c,pol:1.5,charisma:.4,business:.3,heat:-.5});return pick([`Eighteen holes with a judge, a developer and a state senator who cheats on every scorecard. You let him.`,`A foursome at the country club that wouldn't have let your father park cars. Now they laugh at your jokes.`,`You lose to the deputy mayor by one stroke, on purpose. He notices, and appreciates it.`]);}},
+ pCards:{n:'Run the Card Game',d:'Pinochle on the tier. Money and respect.',prison:1,run:g=>{const w=chance(odds(g.s.charisma,g.s.street,35));if(w){A({dirty:sc(g,800),respect:.5});return`Cigarettes, stamps and IOUs. By the end of the week half the tier owes you something.`;}A({respect:-.3,health:-2,hurt:0});return`Somebody accuses you of dealing seconds. It ends with a lunch tray.`;}},
+ pStore:{n:'Commissary Hustle',d:'Sell contraband. Risky.',prison:1,run:g=>{if(chance(.15)){g.prison+=R(4,12);A({respect:-.5});return`A shakedown finds the stash under your bunk. More time added to your sentence.`;}A({dirty:sc(g,1500),street:.3});return`Smuggled cigarettes, phone time and real coffee, sold at a 400% markup.`;}}
+});
 function doAct(k){const a=ACT[k];if(!a)return;if(G.ap<1){toast('No time left this week. End the week.');return;}
  if(a.menu)return actMenu(k);G.ap--;FX=[];CUR={title:a.n,ch:[]};const t=a.run(G);if(t==='NOOP'){render();return;}showResult(t);$('#modal').classList.remove('hidden');}
 const JOBS=[
@@ -1321,7 +1382,8 @@ function pWar(g,d){return clamp(.5+(crewStr(g)*awayF(g)-defStr(g,d))/80,.04,.9);
 function cityNotices(g,d,prevOwner){const n=myD(g).length;const out=[];for(const r of liveR(g)){if(r.id===prevOwner)continue;r.host=clamp(r.host+2+n*.8);if(n>=6)r.host=clamp(r.host+4);}
  const r=rival(g,prevOwner);if(r&&!r.war&&r.host>=80){r.war=true;log(`${r.n} declared war on you.`);out.push(`${r.n} declares war.`);}
  if(n>=6)out.push('The other families are watching you very closely now.');return out.join(' ');}
-function turf(mode,id){const g=G,d=g.dist[id];if(!d)return;if(g.prison){toast('You\'re in prison.');return;}if(!useAP())return;FX=[];const prev=d.own;const r=rival(g,d.own);let t,w;
+const turfCrewOk=g=>active(g).length>=2||(fam(g)&&g.rank>=1);
+function turf(mode,id){const g=G,d=g.dist[id];if(!d)return;if(g.prison){toast('You\'re in prison.');return;}if(!turfCrewOk(g)){toast('You need at least 2 associates to hold a district.');return;}if(!useAP())return;FX=[];const prev=d.own;const r=rival(g,d.own);let t,w;
  if(mode==='neg'){const c=negCost(g,d);if(cash(g)<c){g.ap++;toast('Needs '+money(c));return;}w=chance(pNeg(g,d));A({cash:-Math.round(c*(w?1:.3))});
   if(w){takeDistrict(g,d);A({respect:3});t=(r?`${r.boss} sells you ${d.n} over espresso. Expensive, but nobody bleeds.`:`A few envelopes, a few handshakes. ${d.n} is yours.`)+' '+cityNotices(g,d,prev);}
   else{if(r)r.host=clamp(r.host+8);A({respect:-1});t=`They take the deposit and laugh you out of the room.`;}}
@@ -1615,7 +1677,7 @@ function renderHdr(){const g=G;$('#hdr').classList.remove('hidden');$('#dock').c
 function renderTabs(){$('#tabs').innerHTML=[['life','Life'],['crew','Crew'],['turf','Turf'],['people','People'],['law','Law'],['shop','Shop']].map(([k,n])=>`<button data-a="tab" data-x="${k}" class="${TAB===k?'on':''}">${n}</button>`).join('');}
 function statRow(k,v,col){return`<div class="stat"><span class="l">${LBL[k]}</span><div class="bar"><i style="width:${v}%;background:${col||'var(--gd)'}"></i></div><span class="v">${Math.round(v)}</span></div>`;}
 const st2=(label,v,col)=>`<div class="st2"><div><span>${label}</span><b>${Math.round(v)}</b></div><div class="bar"><i style="width:${clamp(v)}%;background:${col||'var(--gd)'}"></i></div></div>`;
-function vLife(g){const L=ledger(g,false);ensureStory(g);const sub=SUB.life;
+function vLife(g){const L=ledger(g,false);ensureStory(g);favRefresh(g);const sub=SUB.life;
  let h=subseg('life',[['week','This week'],['you','You'],['books','Books'],['story','Story']]);
  if(sub==='week'){
   const acts=Object.entries(ACT).filter(([k,a])=>g.prison?a.prison:!a.prison&&a.ok(g)).map(([k,a])=>k==='contract'?`<button class="act" style="grid-column:1/-1;border-color:#5a2723" data-a="act" data-x="contract" ${g.ap<1?'disabled':''}><b style="color:#e08a82">The contract: ${esc(g.f.contract.name)}</b><span>${Math.max(0,g.f.contract.due-T(g))} week(s) left. Do this and you're made. Miss it and you're finished in this family.</span></button>`:`<button class="act" data-a="act" data-x="${k}" ${g.ap<1?'disabled':''}><b>${a.n}</b><span>${typeof a.d==='function'?a.d(g):a.d}</span></button>`).join('');
@@ -1627,6 +1689,7 @@ function vLife(g){const L=ledger(g,false);ensureStory(g);const sub=SUB.life;
   const adv=advice(g);
   h+=`${g.prison?`<div class="card" style="border-color:#5a2723"><div class="ekick" style="color:#e08a82">Federal Correctional Institution</div><div class="serif" style="font-size:18px;margin:2px 0">${g.prison>=52?Math.floor(g.prison/52)+' yr ':''}${g.prison%52?g.prison%52+' wk ':''}left</div><div class="muted small">Your rackets earn half. Your crew drifts. Rivals circle your territory.</div></div>`:''}
   <div class="card adv"><div class="ekick">${fam(g)&&g.rank<4&&g.npc.sponsor?'The word from '+esc(g.npc.sponsor.first):'The word'}</div>${adv.map(i=>i.tab?`<button class="advi ${i.bad?'bad':''}" data-a="go" data-x="${i.tab}:${i.sub||''}"><span>${i.t}</span><i>›</i></button>`:`<div class="advi ${i.bad?'bad':''}"><span>${i.t}</span></div>`).join('')}</div>
+  ${!g.prison&&(g.favors||[]).length?`<div class="sec">Favors asked of you</div><div class="card" style="padding:2px 12px">${g.favors.map((fv,i)=>{const f=FAV.find(x=>x.k===fv.k);return f?`<button class="advi" data-a="fav" data-x="${i}"><span><b style="font-weight:600">${f.n}</b><br><small class="muted">${esc(fv.who)} · ≈${Math.round(odds(g.s[f.s[0]],g.s[f.s[1]],f.df)*100)}%</small></span><i>›</i></button>`:'';}).join('')}</div>`:''}
   <div class="sec">Your moves · ${g.ap} of ${apMax(g)} left</div><div class="grid2">${acts}</div>
   ${fam(g)&&g.rank<4&&!g.prison?`<div class="sec">Kick-up to the family</div><div class="seg">${[['honest','Honest'],['light','Light skim'],['heavy','Heavy skim']].map(([k,n])=>`<button data-a="trib" data-x="${k}" class="${g.tribute===k?'on':''}">${n}</button>`).join('')}</div>`:''}
   ${moves.length?`<div class="sec">Big moves</div><div class="row" style="flex-wrap:wrap;gap:6px">${moves.join('')}</div>${foundReq}`:''}`;}
@@ -1674,6 +1737,7 @@ function vTurf(g){if(SEL==null||!g.dist[SEL])SEL=(myD(g)[0]||g.dist[0]).id;const
    <div class="grid2" style="margin-top:10px">${(d.sec||0)<3?`<button class="btn sm" data-a="sec" data-x="${d.id}" ${cash(g)<SEC[(d.sec||0)+1].c?'disabled':''}>${SEC[(d.sec||0)+1].n} · ${money(SEC[(d.sec||0)+1].c)}</button>`:'<span class="muted small" style="align-self:center">Fully fortified</span>'}<button class="btn sm gold" data-a="rkopen" ${room?'':'disabled'}>${room?(RKOPEN?'Hide rackets ▴':'Open a racket ▾'):'No room (× to sell one)'}</button></div>
    ${room&&RKOPEN?`<div style="display:grid;gap:6px;margin-top:8px">${avail.map(k=>{const r=RK[k],why=rackOk(g,k);return item('rack',d.id+':'+k,r.n,money(r.c),`~${money(r.i*(0.7+0.3*d.w)*ebm/52)}/wk · heat ${r.h>0?'+':''}${r.h}${r.l?' · cleans '+money(r.l)+'/yr':''}${why?' · '+why:''}${r.drug&&fam(g)&&trad(g)&&!g.f.drugsOk?' · forbidden by the family':''}`,why||cash(g)<r.c||g.prison);}).join('')}</div>`:''}`;}
   else if(d.own==='family'&&fam(g)){det=`<div class="muted small">Family territory, run by another crew. You don't move on your own people unless you're ready to stop being one of them.</div>`;}
+  else if(!turfCrewOk(g)){det=`<div class="muted small">Somebody has to collect, stand on the corner and answer the door. You need at least 2 associates on your crew before you can take and hold a district.</div><button class="btn gold sm" style="width:100%;margin-top:8px" data-a="go" data-x="crew:">Go recruit</button>`;}
   else{const pn=pNeg(g,d),pi=pInt(g,d),pw=pWar(g,d);const rr=rival(g,d.own);
    det=`<div class="muted small">Defense ${defStr(g,d)} vs your crew ${Math.round(crewStr(g)*awayF(g))}${d.rk.length?' · '+d.rk.map(k=>RK[k].n).join(', '):''}</div>
    <div style="display:grid;gap:6px;margin-top:8px">
@@ -1786,7 +1850,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
  case'tab':TAB=x;render();toTop();return;
  case'sub':{const[t,k]=x.split(':');SUB[t]=k;SHOPALL=false;render();toTop();return;}
  case'go':{const[t,k]=x.split(':');TAB=t;if(k)SUB[t]=k;render();toTop();return;}
- case'goal':return claimGoal(x);case'story':return tellStory();
+ case'goal':return claimGoal(x);case'bj':return bjAct(x);case'fav':return favOpen(x);case'story':return tellStory();
  case'crewopen':CREWOPEN=CREWOPEN===+x?null:+x;render();return;case'rkopen':RKOPEN=!RKOPEN;render();return;case'shopall':SHOPALL=true;render();return;case'jobgrp':return jobMenu(G,x);
  case'endWeek':return endWeek();
  case'act':return doAct(x);
