@@ -204,6 +204,38 @@ body.locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .advi small{font-size:11.5px}
 .grid2 .act span{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .grid2 .act{display:flex;flex-direction:column;justify-content:center}
+
+/* noir title */
+.title2{display:flex;flex-direction:column;margin:-10px -12px 0;position:relative}
+.scene{position:relative;height:56vh;height:56dvh;min-height:300px;max-height:560px;overflow:hidden}
+.noir{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scene .fade{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(transparent,var(--bg))}
+.neon{animation:flick 6s infinite}
+@keyframes flick{0%,18%,22%,62%,64%,100%{opacity:1}20%,63%{opacity:.25}21%{opacity:.8}}
+.neonr{animation:flick 6s infinite}
+.ember{animation:ember 2.4s ease-in-out infinite}
+@keyframes ember{0%,100%{opacity:.55}50%{opacity:1;r:2.2}}
+.smoke{stroke-dasharray:60;animation:smoke 5s linear infinite}
+@keyframes smoke{from{stroke-dashoffset:60;opacity:.4}to{stroke-dashoffset:-60;opacity:0}}
+.rain{animation:rainf .5s linear infinite}
+@keyframes rainf{from{transform:translate(0,-26px)}to{transform:translate(-4px,0)}}
+@media (prefers-reduced-motion:reduce){.neon,.neonr,.ember,.smoke,.rain{animation:none}}
+.tblock{position:relative;margin-top:-17vh;padding:0 24px calc(28px + env(safe-area-inset-bottom));text-align:center}
+.kick2{font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--gd)}
+.logo2{font-family:var(--serif);font-weight:900;font-size:clamp(72px,24vw,112px);line-height:.95;letter-spacing:10px;margin:6px 0 0 10px;background:linear-gradient(180deg,#f6e2b4 0%,#c9a35b 48%,#7d5d28 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 24px rgba(201,163,91,.15)}
+.rule2{display:flex;align-items:center;gap:10px;margin:8px auto 12px;max-width:220px}.rule2 span{flex:1;height:1px;background:linear-gradient(90deg,transparent,#8a2f2a)}.rule2 span:last-child{transform:scaleX(-1)}.rule2 i{font-style:normal;color:#b8463e;font-size:10px}
+.epi2{font-family:var(--serif);font-style:italic;font-size:19px;color:#e9e4d8}
+.tag2{color:var(--mu);font-size:13.5px;line-height:1.55;max-width:360px;margin:10px auto 22px}
+.tbtn{display:block;width:100%;max-width:420px;margin:0 auto 10px;padding:13px 16px;border:1px solid var(--ln);border-radius:8px;background:rgba(18,20,24,.85);text-align:center}
+.tbtn b{display:block;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
+.tbtn span{display:block;font-size:12px;color:var(--mu);margin-top:3px}
+.tbtn.gold{background:linear-gradient(180deg,#d8b46a,#b48a42);border-color:#e0bf7a;color:#16120a;box-shadow:0 8px 28px rgba(201,163,91,.22)}
+.tbtn.gold span{color:#3d2e12}
+.tlink{display:block;margin:6px auto 0;font-size:12.5px;color:var(--gd);text-decoration:underline;text-underline-offset:3px;padding:8px}
+.omerta{margin-top:14px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5c5850}
+#app:has(.title2){padding-bottom:0}
+.title2 ~ *{display:none}
+@media(min-width:600px){.scene{height:auto;max-height:none;aspect-ratio:400/520;width:min(100%,440px);margin:0 auto;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}.tblock{margin-top:-120px}}
 </style>
 </head>
 <body>
@@ -1815,10 +1847,71 @@ function vShop(g){const c=cash(g);const dw=(cost,own)=>!own&&g.clean<cost&&c>=co
 
 /* ================= TITLE / SETUP ================= */
 function skyline(){let s='';let x=0;while(x<800){const w=R(28,70),h=R(60,240);s+=`<rect x="${x}" y="${260-h}" width="${w}" height="${h}" fill="#101216"/>`;for(let wy=260-h+10;wy<250;wy+=14)for(let wx=x+6;wx<x+w-6;wx+=10)if(chance(.12))s+=`<rect x="${wx}" y="${wy}" width="4" height="6" fill="${chance(.8)?'#c9a35b':'#e9e4d8'}" opacity="${(Math.random()*.6+.2).toFixed(2)}"/>`;x+=w+R(0,6);}return`<svg class="sky" viewBox="0 0 800 260" preserveAspectRatio="xMidYMax slice">${s}</svg>`;}
+function noirScene(){let win='',x=0;const far=[];while(x<400){const w=R(22,46),h=R(90,210);far.push(`<rect x="${x}" y="${300-h}" width="${w}" height="${h+40}" fill="#0b0d12"/>`);for(let wy=300-h+8;wy<290;wy+=11)for(let wx=x+4;wx<x+w-4;wx+=8)if(chance(.09))win+=`<rect x="${wx}" y="${wy}" width="3" height="5" fill="${chance(.85)?'#d9a85a':'#e9e4d8'}" opacity="${(Math.random()*.5+.25).toFixed(2)}"/>`;x+=w+R(0,4);}
+ let rain='';for(let i=0;i<70;i++){const rx=R(-20,420),ry=R(-40,520),l=R(14,26);rain+=`<line x1="${rx}" y1="${ry}" x2="${rx-4}" y2="${ry+l}"/>`;}
+ return`<svg class="noir" viewBox="0 0 400 520" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+ <defs>
+  <linearGradient id="nsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#040508"/><stop offset=".55" stop-color="#0d0c10"/><stop offset="1" stop-color="#2a1a10"/></linearGradient>
+  <radialGradient id="nlamp" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#f3c77a" stop-opacity=".55"/><stop offset=".55" stop-color="#d9a85a" stop-opacity=".12"/><stop offset="1" stop-color="#d9a85a" stop-opacity="0"/></radialGradient>
+  <radialGradient id="npool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f3c77a" stop-opacity=".35"/><stop offset="1" stop-color="#f3c77a" stop-opacity="0"/></radialGradient>
+  <linearGradient id="nstreet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d0e12"/><stop offset="1" stop-color="#050608"/></linearGradient>
+  <filter id="nglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <radialGradient id="nred" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff3a3a" stop-opacity=".22"/><stop offset="1" stop-color="#ff3a3a" stop-opacity="0"/></radialGradient>
+ </defs>
+ <rect width="400" height="520" fill="url(#nsky)"/>
+ 
+ ${far.join('')}${win}
+ <!-- club building -->
+ <rect x="236" y="150" width="164" height="250" fill="#08090c"/>
+ <rect x="252" y="176" width="34" height="46" fill="#120f0b"/><rect x="304" y="176" width="34" height="46" fill="#2a1d0e" opacity=".9"/><rect x="356" y="176" width="34" height="46" fill="#120f0b"/>
+ <rect x="304" y="176" width="34" height="46" fill="#d9a85a" opacity=".18"/>
+ <path d="M252 240h138M252 244h138M262 240v30M290 240v30M318 240v30M346 240v30M374 240v30" stroke="#16181d" stroke-width="2"/>
+ <g class="neon" filter="url(#nglow)"><rect x="256" y="290" width="132" height="32" rx="4" fill="none" stroke="#ff3a3a" stroke-width="2"/><text x="322" y="311" text-anchor="middle" font-family="Playfair Display,Georgia,serif" font-size="13" font-weight="700" letter-spacing="1.5" fill="#ff5a4a">SOCIAL CLUB</text></g>
+ <rect x="300" y="334" width="44" height="66" fill="#1d130b"/><rect x="300" y="334" width="44" height="66" fill="#d9a85a" opacity=".22"/><rect x="318" y="334" width="2" height="66" fill="#08090c"/>
+ <!-- lamp light -->
+ <polygon points="96,118 30,410 170,410" fill="url(#nlamp)"/>
+ <ellipse cx="100" cy="414" rx="90" ry="16" fill="url(#npool)"/>
+ <!-- street -->
+ <rect x="0" y="400" width="400" height="120" fill="url(#nstreet)"/>
+ <rect x="0" y="398" width="400" height="3" fill="#1a1b20"/>
+ <ellipse cx="99" cy="430" rx="6" ry="26" fill="url(#npool)"/>
+ <ellipse cx="322" cy="418" rx="44" ry="14" fill="url(#nred)" class="neonr"/>
+ <!-- lamp post -->
+ <rect x="94" y="120" width="5" height="282" fill="#07080a"/><path d="M84 400h25v6H84z" fill="#07080a"/>
+ <path d="M80 112h33l-5 10H85z" fill="#07080a"/><rect x="88" y="121" width="17" height="3" fill="#f3c77a" opacity=".95"/>
+ <!-- the man -->
+ <g fill="#030304">
+  <ellipse cx="136" cy="292" rx="17" ry="3.6"/>
+  <path d="M127 291c0-11 4-16 9-16s9 5 9 16z"/>
+  <path d="M131 291h11v11h-11z"/>
+  <path d="M124 302c4-3 20-3 24 0l5 30-2 66h-9l-3-44h-4l-3 44h-9l-3-66z"/>
+  <path d="M146 306l10 16-4 3-8-11z"/>
+ </g>
+ <circle cx="154" cy="321" r="1.6" fill="#ff8a3a" class="ember"/>
+ <path class="smoke" d="M155 318c-3-8 5-12 1-20s5-12 1-20" fill="none" stroke="#c9c2b4" stroke-width="1.4" opacity=".35"/>
+ <!-- sedan -->
+ <g fill="#040405"><path d="M196 384c4-14 14-20 30-22l14-16c4-4 9-6 16-6h40c8 0 12 2 17 7l14 15c14 1 24 6 27 22l2 16H194z"/>
+  <circle cx="226" cy="400" r="12"/><circle cx="330" cy="400" r="12"/></g>
+ <path d="M246 360l12-13h22v13zM286 360v-13h16l11 13z" fill="#111317"/>
+ <rect x="348" y="376" width="6" height="5" fill="#c52a22"/>
+ <g class="rain" stroke="#b9c4d6" stroke-width=".8" opacity=".35">${rain}</g>
+ <rect width="400" height="520" fill="url(#nsky)" opacity=".0"/>
+</svg>`;}
 function renderTitle(){$('#hdr').classList.add('hidden');$('#dock').classList.add('hidden');const sv=loadSave();
- $('#view').innerHTML=`<div class="title">${skyline()}<div style="position:relative"><div class="logo">MADE<em>A life in the life</em></div><p class="tagline">Start as a nobody — at sixteen or twenty-one. Earn, scheme, and survive your way up — or out — over forty years in an American city run by men who never write anything down.</p>
- ${sv?`<button class="btn gold" style="width:100%;padding:14px;margin-bottom:8px" data-a="cont">Continue — ${esc(sv.first+' '+sv.last)}, age ${sv.age}</button>`:''}
- <button class="btn ${sv?'':'gold'}" style="width:100%;padding:14px" data-a="setup">Begin a new life</button><button class="btn sm" style="width:100%;margin-top:8px" data-a="import">Load from a save code</button></div></div>`;}
+ $('#view').innerHTML=`<div class="title2">
+ <div class="scene">${noirScene()}<div class="fade"></div></div>
+ <div class="tblock">
+  <div class="kick2">A life in the life</div>
+  <div class="logo2">MADE</div>
+  <div class="rule2"><span></span><i>◆</i><span></span></div>
+  <p class="epi2">Nobody gets made by accident.</p>
+  <p class="tag2">Start with nothing at sixteen, or kiss a ring at twenty-one. Forty years. Four cities. A family that either takes you in or buries you.</p>
+  ${sv?`<button class="tbtn gold" data-a="cont"><b>Continue</b><span>${esc(sv.first+' '+sv.last)} · age ${sv.age}${sv.famName?' · '+esc(sv.famName.replace(/^the /,'The ')):''}</span></button>`:''}
+  <button class="tbtn ${sv?'':'gold'}" data-a="setup"><b>Begin a new life</b><span>Choose your city, your blood, your start</span></button>
+  <button class="tlink" data-a="import">Load from a save code</button>
+  <div class="omerta">Omertà · For mature players</div>
+ </div></div>`;}
+
 function renderSetup(){const s=SETUP;const H=HER[s.her];
  const opt=(key,obj)=>`<div class="opt">${Object.entries(obj).map(([k,v])=>`<button data-a="pick" data-x="${key}:${k}" class="${s[key]===k?'on':''}"><b>${v.n}</b><span>${v.d}</span></button>`).join('')}</div>`;
  $('#view').innerHTML=`<div style="padding:30px 2px 40px"><div class="ekick">New life</div><div class="etitle" style="font-size:30px">Who are you?</div>
