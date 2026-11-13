@@ -207,9 +207,9 @@ body.locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 
 /* noir title */
 .title2{display:flex;flex-direction:column;margin:-10px -12px 0;position:relative}
-.scene{position:relative;height:56vh;height:56dvh;min-height:300px;max-height:560px;overflow:hidden}
+.scene{position:relative;height:53vh;height:53dvh;min-height:300px;max-height:560px;overflow:hidden}
 .noir{position:absolute;inset:0;width:100%;height:100%;display:block}
-.scene .fade{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(transparent,var(--bg))}
+.scene .fade{position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(transparent,var(--bg))}
 .neon{animation:flick 6s infinite}
 @keyframes flick{0%,18%,22%,62%,64%,100%{opacity:1}20%,63%{opacity:.25}21%{opacity:.8}}
 .neonr{animation:flick 6s infinite}
@@ -220,7 +220,7 @@ body.locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .rain{animation:rainf .5s linear infinite}
 @keyframes rainf{from{transform:translate(0,-26px)}to{transform:translate(-4px,0)}}
 @media (prefers-reduced-motion:reduce){.neon,.neonr,.ember,.smoke,.rain{animation:none}}
-.tblock{position:relative;margin-top:-17vh;padding:0 24px calc(28px + env(safe-area-inset-bottom));text-align:center}
+.tblock{position:relative;margin-top:-12vh;padding:0 24px calc(28px + env(safe-area-inset-bottom));text-align:center}
 .kick2{font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--gd)}
 .logo2{font-family:var(--serif);font-weight:900;font-size:clamp(72px,24vw,112px);line-height:.95;letter-spacing:10px;margin:6px 0 0 10px;background:linear-gradient(180deg,#f6e2b4 0%,#c9a35b 48%,#7d5d28 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 24px rgba(201,163,91,.15)}
 .rule2{display:flex;align-items:center;gap:10px;margin:8px auto 12px;max-width:220px}.rule2 span{flex:1;height:1px;background:linear-gradient(90deg,transparent,#8a2f2a)}.rule2 span:last-child{transform:scaleX(-1)}.rule2 i{font-style:normal;color:#b8463e;font-size:10px}
@@ -1880,15 +1880,41 @@ function noirScene(){let win='',x=0;const far=[];while(x<400){const w=R(22,46),h
  <rect x="94" y="120" width="5" height="282" fill="#07080a"/><path d="M84 400h25v6H84z" fill="#07080a"/>
  <path d="M80 112h33l-5 10H85z" fill="#07080a"/><rect x="88" y="121" width="17" height="3" fill="#f3c77a" opacity=".95"/>
  <!-- the man -->
- <g fill="#030304">
-  <ellipse cx="136" cy="292" rx="17" ry="3.6"/>
-  <path d="M127 291c0-11 4-16 9-16s9 5 9 16z"/>
-  <path d="M131 291h11v11h-11z"/>
-  <path d="M124 302c4-3 20-3 24 0l5 30-2 66h-9l-3-44h-4l-3 44h-9l-3-66z"/>
-  <path d="M146 306l10 16-4 3-8-11z"/>
+ <defs><linearGradient id="gmet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5d636d"/><stop offset=".5" stop-color="#2a2e35"/><stop offset="1" stop-color="#15171b"/></linearGradient>
+  <linearGradient id="gwood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4021"/><stop offset="1" stop-color="#2e1a0c"/></linearGradient></defs>
+ <g transform="translate(136,401) scale(1.22)">
+  <g fill="#030304">
+   <path d="M-11 -1c-1-3 0-5 3-5h5l1 6z M3 -6h6c3 0 5 2 4 5H3z"/>
+   <path d="M-10 -32h8l-1 27h-6z M2 -32h8l1 27h-6z"/>
+   <path d="M-17 -103c5-4 29-4 34 0l3 30-3 41c-2 3-32 3-34 0l-3-41z"/>
+   <path d="M-8 -106l8 5 8-5 3 8-11 7-11-7z"/>
+   <ellipse cx="0" cy="-114" rx="6" ry="7.5"/>
+   <ellipse cx="0" cy="-121" rx="18" ry="3.4"/>
+   <path d="M-10 -121c-1-8 2-13 10-13s11 5 10 13z"/>
+   <path d="M-15 -100c-6 14-6 28 3 40l7-3c-6-10-6-22-3-34z"/>
+   <path d="M15 -100c5 12 9 24 13 34l-6 3c-4-9-8-21-10-31z"/>
+  </g>
+  <path d="M-4 -133.5c2 2 6 2 8 0" fill="none" stroke="#1a1b1f" stroke-width="1"/>
+  <rect x="-10" y="-125" width="20" height="2.4" fill="#3a2c18"/>
+  <path d="M-3 -104l3 9 3-9z" fill="#2a2620"/><path d="M-.6 -102h1.2l.6 7h-2.4z" fill="#030304"/>
+  <path d="M7 -96l5 -1 -1 3z" fill="#bfb49e" opacity=".85"/>
+  <!-- Thompson -->
+  <g transform="rotate(-14 8 -60)">
+   <path d="M-22 -54l15 -8 2 6 -15 8z" fill="url(#gwood)"/>
+   <rect x="-6" y="-65" width="22" height="8" rx="1.2" fill="url(#gmet)"/>
+   <path d="M-2 -58h5l-1.5 9h-5z" fill="url(#gwood)"/>
+   <circle cx="8" cy="-49" r="8" fill="url(#gmet)"/><circle cx="8" cy="-49" r="5" fill="none" stroke="#7a808a" stroke-width=".7" opacity=".7"/><circle cx="8" cy="-49" r="1.4" fill="#0a0b0d"/>
+   <path d="M19 -58h5l-1 9h-5z" fill="url(#gwood)"/>
+   <rect x="16" y="-64" width="25" height="4.2" fill="url(#gmet)"/>
+   <path d="M19 -64v4.2M22 -64v4.2M25 -64v4.2M28 -64v4.2M31 -64v4.2M34 -64v4.2M37 -64v4.2" stroke="#0e1013" stroke-width=".9"/>
+   <rect x="40" y="-64.8" width="6" height="5.6" rx=".8" fill="#2a2e35"/>
+   <path d="M-6 -65h47" stroke="#a9b0ba" stroke-width=".6" opacity=".55"/>
+   <ellipse cx="0" cy="-55" rx="3.4" ry="3" fill="#030304"/><ellipse cx="21" cy="-55" rx="3.4" ry="3" fill="#030304"/>
+  </g>
+  <path d="M-18 -121c0 0 3-1 8-1 M-10 -122c-1-7 1-11 4-12 M-17 -102c-1 20-2 45-3 70 M-10 -32v27" fill="none" stroke="#f3c77a" stroke-width=".9" opacity=".5"/>
  </g>
- <circle cx="154" cy="321" r="1.6" fill="#ff8a3a" class="ember"/>
- <path class="smoke" d="M155 318c-3-8 5-12 1-20s5-12 1-20" fill="none" stroke="#c9c2b4" stroke-width="1.4" opacity=".35"/>
+ <circle cx="143.5" cy="264" r="1.6" fill="#ff8a3a" class="ember"/>
+ <path class="smoke" d="M144.5 261c-3-8 5-12 1-20s5-12 1-20" fill="none" stroke="#c9c2b4" stroke-width="1.4" opacity=".35"/>
  <!-- sedan -->
  <g fill="#040405"><path d="M196 384c4-14 14-20 30-22l14-16c4-4 9-6 16-6h40c8 0 12 2 17 7l14 15c14 1 24 6 27 22l2 16H194z"/>
   <circle cx="226" cy="400" r="12"/><circle cx="330" cy="400" r="12"/></g>
